@@ -14,23 +14,30 @@ const ContactCreated = ({ id }) => {
 
       if (selectedOption === "created") {
         updatedFields["contact_created"] = {
-          id: id,
-          raw_data: { new_value: "created",},
+          field_name: "created_contact",
+          id,
+          raw_data: { new_value: "created" },
         };
-      } else {
-        // Remove the field from context when unselected
-        delete updatedFields["contact_created"];
-      }
+      // } else {
+      //   // Remove the field from context when unselected
+      //   delete updatedFields["contact_created"];
+       }
 
       return updatedFields;
     });
-  }, [selectedOption, id, setTargetComponentFields]);
+  }, [selectedOption, setTargetComponentFields]);
+
+
 
   const handleSelectChange = (event) => {
-    setSelectedOption(event.target.value);
+    setSelectedOption(event.target.value
+
+    );
   };
 
-  console.log("Context Updated:", targetComponentFields);
+  console.log("Context Updated:", 
+ targetComponentFields
+  );
 
   return (
     <div>

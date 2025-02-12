@@ -17,4 +17,9 @@ export class ActionController {
   async getAllActions(): Promise<Action[]> {
     return await this.actionService.getAllActions();
   }
+
+  @Post('getbyid')
+  async getAllActionById(@Body('entity_id') id : number): Promise<Action[]>{
+    return await this.actionService.getActionById(id);
+  }
 }

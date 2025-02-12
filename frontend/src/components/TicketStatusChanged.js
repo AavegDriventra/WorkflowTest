@@ -1,10 +1,14 @@
 import axios from 'axios';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
+import { userContext } from '../App';
 
-const TicketStatusChanged = () => {
+
+const TicketStatusChanged = ({id}) => {
   const [ticketFields, setTicketFields] = useState([]);
   const [selectedFields, setSelectedFields] = useState([]); // State to store selected fields
   const [fieldValues, setFieldValues] = useState({}); // State to store old and new values for each field
+
+  const { targetComponentFields, setTargetComponentFields } = useContext(userContext);
 
   // Fetch the fields when the component mounts
   useEffect(() => {
@@ -18,31 +22,70 @@ const TicketStatusChanged = () => {
   }, []); // Empty dependency array means this will run only once, when the component mounts
 
   // Handle multi-select change
-  const handleSelectChange = (event) => {
+  const handleFieldSelectChange = (event) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
-    setSelectedFields(selectedOptions);  // Update the selected fields array
+    console.log("Selected fields:", selectedOptions);
+    setSelectedFields(selectedOptions);
 
-    // Initialize the fieldValues state with empty new and old values for selected fields
-    const newFieldValues = { ...fieldValues };
+    const updatedValues = {};
     selectedOptions.forEach((field) => {
-      if (!newFieldValues[field]) {
-        newFieldValues[field] = { oldValue: '', newValue: '' };
+      if (!updatedValues[field]) {
+        updatedValues[field] = {
+          field_name: field,
+          id: id,
+          raw_data: { old_value: "", new_value: "" },
+        };
       }
+
     });
-    setFieldValues(newFieldValues);  // Set the field values state
+    console.log("Updated Values : ",
+      updatedValues
+    );
+
+    setFieldValues(updatedValues);
   };
 
   // Handle input field changes (for old and new values)
-  const handleFieldValueChange = (field, type, value) => {
-    const newFieldValues = { ...fieldValues };
-    newFieldValues[field][type] = value;
-    setFieldValues(newFieldValues);  // Update the field values state
+  const handleInputChange = (field, type, value) => {
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [field]: {
+        ...prevValues[field],
+        raw_data: {
+          ...prevValues[field]?.raw_data,
+          [type]: value,
+        },
+      },
+    }));
   };
+
+
+  useEffect(() => {
+      setTargetComponentFields((prevContex) => {
+        console.log("PrevContext for prev : ", prevContex);
+  
+        const otherComponentFields = {};
+        if (prevContex) {
+          Object.entries(prevContex).forEach(([field_name, field_data]) => {
+            console.log("fieldName : ", field_name, "\n field_Values : ", field_data)
+            if (field_data.id !== id) {
+              otherComponentFields[field_name] = field_data;
+              console.log(otherComponentFields)
+            } // field_id is equal to current component id if it is true key value pair will be added to otherComponentFields
+          })
+        }
+        console.log("field values : ", fieldValues)
+  
+        return { ...otherComponentFields, ...fieldValues }
+  
+      })
+    }, [fieldValues]);
 
   return (
     <div>
-      <select multiple value={selectedFields} onChange={handleSelectChange}>
-        <option value="">Select Ticket Fields</option>
+      {/* Multi-select dropdown for fields */}
+      <select multiple value={selectedFields} onChange={handleFieldSelectChange}>
+        <option value="">Select Contact Fields</option>
         {ticketFields.map((field, index) => (
           <option key={index} value={field}>
             {field}
@@ -50,32 +93,29 @@ const TicketStatusChanged = () => {
         ))}
       </select>
 
-      {/* Dynamically render input fields for each selected field */}
+      {/* Inputs for selected fields */}
       <div>
-        <h3>Selected Fields:</h3>
         {selectedFields.map((field, index) => (
-          <div key={index} style={{ marginBottom: '20px' }}>
+          <div key={index}>...
             <h4>{field}</h4>
-
-            {/* Input for Old Value */}
-            <div>
-              <label>Old Value:</label>
+            <label>
+              Old Value:
               <input
                 type="text"
-                value={fieldValues[field]?.oldValue || ''}
-                onChange={(e) => handleFieldValueChange(field, 'oldValue', e.target.value)}
+                value={fieldValues[field]?.raw_data?.old_value || ''}
+                onChange={(e) => handleInputChange(field, 'old_value', e.target.value)}
+                placeholder="Enter New Value"
               />
-            </div>
-
-            {/* Input for New Value */}
-            <div>
-              <label>New Value:</label>
+            </label>
+            <label>
+              New Value:
               <input
                 type="text"
-                value={fieldValues[field]?.newValue || ''}
-                onChange={(e) => handleFieldValueChange(field, 'newValue', e.target.value)}
+                value={fieldValues[field]?.raw_data?.new_value || ''}
+                onChange={(e) => handleInputChange(field, 'new_value', e.target.value)}
+                placeholder="Enter Old value"
               />
-            </div>
+            </label>
           </div>
         ))}
       </div>

@@ -9,14 +9,14 @@ const ContactUpdated = ({ id }) => {
 
   // Get the context value
   const { targetComponentFields, setTargetComponentFields } = useContext(userContext);
-  console.log("Context Value in ContactUpdated:", targetComponentFields);
+  // console.log("Context Value in ContactUpdated:", targetComponentFields);
 
   // Fetch contact fields from API
   useEffect(() => {
     const fetchContactFields = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/contacts/fields');
-        console.log('Contact Fields:', response.data);
+        const response = await axios.get('http://localhost:8000/contacts/fields'); //  pass in the object instead of array object with the id 
+        // console.log('Contact Fields:', response.data);
         setContactFields(response.data);
       } catch (error) {
         console.error("Error fetching contact fields:", error);
@@ -25,26 +25,30 @@ const ContactUpdated = ({ id }) => {
     fetchContactFields();
   }, []);
 
+
+
   // Handle field selection
   const handleFieldSelectChange = (event) => {
     const selectedOptions = Array.from(event.target.selectedOptions, option => option.value);
-    console.log("Selected fields:", selectedOptions);
+    // console.log("Selected fields:", selectedOptions);
     setSelectedFields(selectedOptions);
 
-    setFieldValues((prevValues) => {
-      const updatedValues = { ...prevValues };
-      selectedOptions.forEach((field) => {
-        if (!updatedValues[field]) {
-          updatedValues[field] = {
-            id: id,
-            raw_data: { old_value: "", new_value: "" },
-          };
-        }
-      });
-      
+    const updatedValues = {};
+    selectedOptions.forEach((field) => {
+      if (!updatedValues[field]) {
+        updatedValues[field] = {
+          field_name: field,
+          id: id,
+          raw_data: { old_value: "", new_value: "" },
+        };
+      }
 
-      return updatedValues;
     });
+    // console.log("Updated Values : ",
+    //   updatedValues
+    // );
+
+    setFieldValues(updatedValues);
   };
 
   // Handle input changes for old/new values
@@ -63,11 +67,25 @@ const ContactUpdated = ({ id }) => {
 
   // Update the context whenever fieldValues change
   useEffect(() => {
-    setTargetComponentFields((prevContext) => ({
-      ...prevContext,
-      ...fieldValues, // Merge new field values into the context
-    }));
-  }, [fieldValues, setTargetComponentFields]);
+    setTargetComponentFields((prevContex) => {
+      // console.log("PrevContext for prev : ", prevContex);
+
+      const otherComponentFields = {};
+      if (prevContex) {
+        Object.entries(prevContex).forEach(([field_name, field_data]) => {
+          // console.log("fieldName : ", field_name, "\n field_Values : ", field_data)
+          if (field_data.id !== id) {
+            otherComponentFields[field_name] = field_data;
+            // console.log(otherComponentFields)
+          } // field_id is equal to current component id if it is true key value pair will be added to otherComponentFields
+        })
+      }
+      // console.log("field values : ", fieldValues)
+
+      return { ...otherComponentFields, ...fieldValues }
+
+    })
+  }, [fieldValues]);
 
   return (
     <div>
@@ -84,7 +102,7 @@ const ContactUpdated = ({ id }) => {
       {/* Inputs for selected fields */}
       <div>
         {selectedFields.map((field, index) => (
-          <div key={index}>
+          <div key={index}>...
             <h4>{field}</h4>
             <label>
               Old Value:

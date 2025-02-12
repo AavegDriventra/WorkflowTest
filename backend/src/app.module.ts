@@ -24,6 +24,9 @@ import { TicketService } from './services/ticket.service';
 import { Contact } from './schema/contact.table.schema';
 import { ContactController } from './controllers/contact.controller';
 import { ContactService } from './services/contact.service';
+import { ActionEvent } from './schema/actionEvent.schema';
+import { ActionEventService } from './services/actionEvent.service';
+import { ActionEventController } from './controllers/actionEvent.controller';
 
 
 @Module({
@@ -34,18 +37,15 @@ import { ContactService } from './services/contact.service';
     username: 'root',
     password:'Aaveg123@',
     database:'test_workflow',
-    entities:[EntityList , Workflow , Target , Event , Action , ActionEntityMeta , Ticket , Contact],
+    entities:[EntityList , Workflow , Target , Event , Action , ActionEntityMeta , Ticket , Contact , ActionEvent],
     synchronize: false,
     logging: true,
     }
   ) ,
-  TypeOrmModule.forFeature([EntityList , Target , Action , Workflow ,Event , ActionEntityMeta , Ticket  , Contact])
+  TypeOrmModule.forFeature([EntityList , Target , Action , Workflow ,Event , ActionEntityMeta , Ticket  , Contact , ActionEvent])
   
 ],
-  controllers: [EntityListController , TargetController ,ActionController, WorkflowController , EventController , ActionEntityMetaController , TicketController , ContactController ],
-  providers: [EntityListService , TargetService , ActionService , WorkFlowService , EventService , ActionEntityMetaService , TicketService , ContactService],
+  controllers: [EntityListController , TargetController ,ActionController, WorkflowController , EventController , ActionEntityMetaController , TicketController , ContactController , ActionEventController ],
+  providers: [EntityListService , TargetService , ActionService , WorkFlowService , EventService , ActionEntityMetaService , TicketService , ContactService , ActionEventService],
 })
 export class AppModule {}
-
-
-

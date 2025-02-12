@@ -14,13 +14,20 @@ export class Event {
   @Column({ type: 'json', nullable: true })
   meta_data: any;
 
+  @Column({ type: 'int', nullable: true })
+  workflow_target_entity_events_id : number;
+
   @ManyToOne(() => Target, (workflowTargetEntityEvents) => workflowTargetEntityEvents.id, { nullable: true })
   @JoinColumn({ name: 'workflow_target_entity_events_id' })
-  workflow_target_entity_events_id: number;
+  workflowTargetEntityEvents: Target;
+
+  @Column({ type: 'int', nullable: true })
+  workflow_id : number;
+
 
   @ManyToOne(() => Workflow, (workflow) => workflow.id, { nullable: true })
   @JoinColumn({ name: 'workflow_id' })
-  workflow_id: number;
+  workflow: Workflow;
 
   @Column({ type: 'int', nullable: true })
   event_order: number;

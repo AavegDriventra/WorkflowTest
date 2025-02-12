@@ -19,4 +19,9 @@ export class ActionService {
   async getAllActions(): Promise<Action[]> {
     return await this.actionRepository.find();
   }
+
+  async getActionById(entity_id: number): Promise<Action[]> {
+          return await this.actionRepository.find({ where: { entity_id } ,
+          });
+      }
 }
